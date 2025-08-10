@@ -8,3 +8,12 @@ venv/
 upload/
 *.log
 *.sqlite3
+uploads/
+test_question.txt
+movies_data.csv
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.json
+test.sh

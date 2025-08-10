@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Form, Request
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import uuid
@@ -8,7 +8,6 @@ import json
 
 from task_engine import run_python_code
 from gemini import parse_question_with_llm, answer_with_data
-
 
 app = FastAPI()
 
@@ -55,8 +54,7 @@ async def analyze(request: Request):
         async with aiofiles.open(first_file, "r") as f:
             question_text = await f.read()
 
-
-    # ✅ 4. Get code steps from LLM
+    # Get code steps from LLM
     response = await parse_question_with_llm(
         question_text=question_text,
         uploaded_files=saved_files,
@@ -65,59 +63,50 @@ async def analyze(request: Request):
 
     print(response)
 
-    # ✅ 5. Execute generated code safely
+    # Execute generated code safely
     execution_result = await run_python_code(response["code"], response["libraries"], folder=request_folder)
-
     print(execution_result)
 
     count = 0
     while execution_result["code"] == 0 and count < 3:
-        print(f"Error occured while scrapping x{count}")
-        new_question_text = str(question_text) + "previous time this error occured" + str(execution_result["output"])
+        print(f"Error occurred while scraping x{count}")
+        new_question_text = str(question_text) + "previous time this error occurred" + str(execution_result["output"])
         response = await parse_question_with_llm(
             question_text=new_question_text,
             uploaded_files=saved_files,
             folder=request_folder
         )
-
         print(response)
-
         execution_result = await run_python_code(response["code"], response["libraries"], folder=request_folder)
-
         print(execution_result)
-
         count += 1
 
     if execution_result["code"] == 1:
         execution_result = execution_result["output"]
     else:
-        return JSONResponse({"message": "error occured while scrapping."})
+        return JSONResponse({"message": "error occurred while scraping."})
 
-    # 6. get answers from llm
+    # Get answers from LLM
     gpt_ans = await answer_with_data(response["questions"], folder=request_folder)
-
     print(gpt_ans)
 
-    # 7. Executing code
+    # Executing code
     try:
         final_result = await run_python_code(gpt_ans["code"], gpt_ans["libraries"], folder=request_folder)
     except Exception as e:
         gpt_ans = await answer_with_data(response["questions"]+str("Please follow the json structure"), folder=request_folder)
-
-        print("Trying after it caught under except block-wrong json format",gpt_ans)
+        print("Trying after it caught under except block-wrong json format", gpt_ans)
         final_result = await run_python_code(gpt_ans["code"], gpt_ans["libraries"], folder=request_folder)
-        
 
     count = 0
     json_str = 1
     while final_result["code"] == 0 and count < 3:
-        print(f"Error occured while executing code x{count}")
-        new_question_text = str(response["questions"]) + "previous time this error occured" + str(final_result["output"])
+        print(f"Error occurred while executing code x{count}")
+        new_question_text = str(response["questions"]) + "previous time this error occurred" + str(final_result["output"])
         if json_str == 0:
             new_question_text += "follow the structure {'code': '', 'libraries': ''}"
             
         gpt_ans = await answer_with_data(new_question_text, folder=request_folder)
-
         print(gpt_ans)
 
         try:
@@ -128,10 +117,7 @@ async def analyze(request: Request):
             print(f"Exception occurred: {e}")
             count -= 1
 
-        
-
         print(final_result)
-
         count += 1
 
     if final_result["code"] == 1:
@@ -148,46 +134,120 @@ async def analyze(request: Request):
             data = json.load(f)
             return JSONResponse(content=data)
         except Exception as e:
-            return JSONResponse({"message": f"Error occured while processing reult.json: {e}"})
-        
-        # Add this at the very end of your main file
+            return JSONResponse({"message": f"Error occurred while processing result.json: {e}"})
 
-from fastapi import FastAPI, Form
-from fastapi.responses import HTMLResponse
-
-
-
-# Add this route to your main.py
+# Web interface route
 @app.get("/", response_class=HTMLResponse)
 async def web_interface():
     return """
     <!DOCTYPE html>
     <html>
-    <head><title>Data Analyst Agent</title></head>
+    <head>
+        <title>🎬 Data Analyst Agent</title>
+        <style>
+            body { 
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                margin: 0; 
+                padding: 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+            }
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                overflow: hidden;
+            }
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 30px;
+                text-align: center;
+            }
+            .content {
+                padding: 30px;
+            }
+            textarea { 
+                width: 100%; 
+                padding: 15px; 
+                border: 2px solid #e1e5e9;
+                border-radius: 10px;
+                font-size: 14px;
+                resize: vertical;
+                min-height: 120px;
+                box-sizing: border-box;
+            }
+            .submit-btn { 
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white; 
+                padding: 15px 30px; 
+                border: none; 
+                border-radius: 10px;
+                cursor: pointer; 
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 15px;
+            }
+            .loading { 
+                display: none; 
+                color: #667eea; 
+                margin-top: 15px;
+                text-align: center;
+            }
+            .example {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                border-left: 4px solid #667eea;
+            }
+        </style>
+    </head>
     <body>
-        <h1>Data Analyst Agent - Test Interface</h1>
-        <form action="/web-api" method="post" enctype="multipart/form-data">
-            <label>Question:</label><br>
-            <textarea name="question" rows="5" cols="50" placeholder="Enter your data analysis question..."></textarea><br><br>
-            <input type="submit" value="Analyze">
-        </form>
+        <div class="container">
+            <div class="header">
+                <h1>🤖 Data Analyst Agent</h1>
+                <p>Intelligent Data Analysis & Visualization Platform</p>
+            </div>
+            
+            <div class="content">
+                <div class="example">
+                    <strong>💡 Try These Questions:</strong>
+                    <ul>
+                        <li>What are the top 10 highest-grossing movies worldwide?</li>
+                        <li>Show me a chart of Indian box office collections</li>
+                        <li>Compare movie ratings between different genres</li>
+                        <li>What are the trending topics on social media?</li>
+                    </ul>
+                </div>
+                
+                <form action="/web-api" method="post" enctype="multipart/form-data" onsubmit="showLoading()">
+                    <label><strong>🎯 Your Data Analysis Question:</strong></label><br><br>
+                    <textarea name="question" placeholder="Ask any data analysis question...
+
+Example: What are the top 10 movies by box office collection in India?"></textarea><br>
+                    
+                    <button type="submit" class="submit-btn">🔍 Analyze Data</button>
+                    <div class="loading" id="loading">
+                        ⏳ Processing your question... This may take up to 3 minutes.
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <script>
+            function showLoading() {
+                document.getElementById('loading').style.display = 'block';
+            }
+        </script>
     </body>
     </html>
     """
 
 @app.post("/web-api")
 async def web_analyze(question: str = Form(...)):
-    # Process the question like your main API
-    return {"question": question, "answer": "Processed via web interface"}
-
-
-@app.post("/web-api")
-async def web_analyze(question: str = Form(...)):
-    # Create a temporary request structure similar to your main API
-    import tempfile
-    import uuid
-    import aiofiles
-    
     # Create a unique folder for this web request
     request_id = str(uuid.uuid4())
     request_folder = os.path.join(UPLOAD_DIR, request_id)
@@ -233,3 +293,6 @@ async def web_analyze(question: str = Form(...)):
     except Exception as e:
         return {"question": question, "error": f"Processing error: {str(e)}"}
 
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

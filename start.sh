@@ -10,13 +10,33 @@ echo ""
 echo " 2. Register at ngrok and get your authtoken:"
 echo "    https://ngrok.com/"
 echo ""
+echo " 3. Create a .env file with:"
+echo "    GENAI_API_KEY=your_google_api_key"
+echo "    NGROK_AUTHTOKEN=your_ngrok_token"
+echo "    api_key=your_google_api_key  # For your existing code"
+echo ""
 echo " This script will:"
+echo "    - Load credentials from .env file"
 echo "    - Install all requirements from requirements.txt"
 echo "    - Install ngrok (if not already installed)"
 echo "    - Start your FastAPI app with uvicorn"
 echo "    - Create a public ngrok URL for your app"
 echo "=============================================="
 echo ""
+
+# ================= LOAD FROM .ENV FILE =================
+if [ -f ".env" ]; then
+    echo "Loading environment variables from .env file..."
+    export $(grep -v '^#' .env | xargs)
+    echo "✅ Environment variables loaded from .env"
+else
+    echo "❌ .env file not found. Please create one with your credentials."
+    echo "Example .env file:"
+    echo "GENAI_API_KEY=your_google_api_key_here"
+    echo "NGROK_AUTHTOKEN=your_ngrok_token_here"
+    echo "api_key=your_google_api_key_here"
+    exit 1
+fi
 
 # ================= CREATE & ACTIVATE VENV =================
 if [ ! -d "venv" ]; then
@@ -25,34 +45,24 @@ if [ ! -d "venv" ]; then
 fi
 
 echo "Activating virtual environment..."
-# Activate venv depending on shell
 source venv/bin/activate
 
-
-# ================= GET CREDENTIALS =================
-# Google API Key
-if [ -n "$GENAI_API_KEY" ]; then
-    read -p "GENAI_API_KEY is already set. Do you want to change it? (y/n): " change_key
-    if [[ "$change_key" =~ ^[Yy]$ ]]; then
-        read -p "Enter your GENAI API key: " GENAI_API_KEY
-    fi
-else
+# ================= VALIDATE CREDENTIALS =================
+if [ -z "$GENAI_API_KEY" ]; then
+    echo "❌ GENAI_API_KEY not found in .env file"
     read -p "Enter your GENAI API key: " GENAI_API_KEY
-fi
-export GENAI_API_KEY=$GENAI_API_KEY
-
-# ngrok Auth Token
-if [ -n "$NGROK_AUTHTOKEN" ]; then
-    read -p "NGROK_AUTHTOKEN is already set. Do you want to change it? (y/n): " change_ngrok
-    if [[ "$change_ngrok" =~ ^[Yy]$ ]]; then
-        read -p "Enter your ngrok authtoken: " NGROK_AUTH
-    else
-        NGROK_AUTH=$NGROK_AUTHTOKEN
-    fi
+    export GENAI_API_KEY=$GENAI_API_KEY
 else
-    read -p "Enter your ngrok authtoken: " NGROK_AUTH
+    echo "✅ GENAI_API_KEY loaded from .env"
 fi
-export NGROK_AUTHTOKEN=$NGROK_AUTH
+
+if [ -z "$NGROK_AUTHTOKEN" ]; then
+    echo "❌ NGROK_AUTHTOKEN not found in .env file"
+    read -p "Enter your ngrok authtoken: " NGROK_AUTHTOKEN
+    export NGROK_AUTHTOKEN=$NGROK_AUTHTOKEN
+else
+    echo "✅ NGROK_AUTHTOKEN loaded from .env"
+fi
 
 # ================= INSTALL REQUIREMENTS =================
 echo "Installing dependencies from requirements.txt..."
@@ -68,10 +78,9 @@ else
 fi
 
 # ================= CONFIGURE NGROK =================
-$NGROK_BIN config add-authtoken "$NGROK_AUTH"
+$NGROK_BIN config add-authtoken "$NGROK_AUTHTOKEN"
 
 # ================= DETECT APP FILE =================
-# Default to "app:main" unless a file called main.py exists
 if [ -f "main.py" ]; then
     APP_TARGET="main:app"
 elif [ -f "app.py" ]; then
