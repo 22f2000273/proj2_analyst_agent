@@ -1,0 +1,19 @@
+--- Metadata for data.csv ---
+
+Description: Top 10 high-rated Indian movies scraped from IMDb.
+Source URL: https://www.imdb.com/search/title/?countries=in&sort=user_rating,desc&title_type=feature
+
+DataFrame Info:
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 0 entries
+Empty DataFrame
+
+
+DataFrame Columns:
+[]
+
+DataFrame Head (first 5 rows):
+Empty DataFrame
+Columns: []
+Index: []
+
