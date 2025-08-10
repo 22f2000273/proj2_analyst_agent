@@ -15,5 +15,4 @@ movies_data.csv
 *.tsv
 *.xlsx
 *.xls
-*.json
 test.sh
