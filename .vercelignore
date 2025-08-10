@@ -1,0 +1,9 @@
+# Ignore everything first
+/*
+
+# Then allow specific files
+!main.py
+!gemini.py  
+!task_engine.py
+!requirements.txt
+!vercel.json
