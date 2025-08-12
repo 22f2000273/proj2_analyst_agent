@@ -1,15 +1,18 @@
 {
-  "version": 2,
-  "functions": {
-    "main.py": {
-      "runtime": "@vercel/python@3.9",
-      "maxDuration": 180
+  "builds": [
+    {
+      "src": "*.py",
+      "use": "@vercel/python"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "main.py"
+      "dest": "app.py"
     }
-  ]
+  ],
+  "env": {
+    "GENAI_API_KEY": "@GENAI_API_KEY"
+  },
+  "version": 2
 }
