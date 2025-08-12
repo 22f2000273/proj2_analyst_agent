@@ -16,3 +16,4 @@ movies_data.csv
 *.xlsx
 *.xls
 test.sh
+.vercel
