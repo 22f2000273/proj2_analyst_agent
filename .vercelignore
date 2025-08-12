@@ -1,9 +1,76 @@
-# Ignore everything first
-/*
+# Environment and secrets
+.env
+.env.*
+*.env
 
-# Then allow specific files
-!main.py
-!gemini.py  
-!task_engine.py
-!requirements.txt
-!vercel.json
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Development and test files
+test_files/
+test_*.py
+*_test.py
+test_question.txt
+test.sh
+
+# Data files (can be large)
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.json
+movies_data.csv
+
+# Runtime generated files
+uploads/
+upload/
+temp/
+logs/
+*.log
+
+# Database files
+*.sqlite3
+*.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Backup files
+*.backup
+*.bak
+*.tmp
