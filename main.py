@@ -270,14 +270,14 @@ async def web_analyze(question: str = Form(...)):
         return {"question": question, "error": f"Processing error: {str(e)}"}
 
 # ✅ ESSENTIAL: Add Vercel handler
-try:
-    from mangum import Mangum
-    handler = Mangum(app)
-except ImportError:
-    handler = app
+# At the very end of your main.py file
+from mangum import Mangum
 
-app.handler = handler
+# Simple, direct handler creation
+handler = Mangum(app)
 
+# For local development
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
