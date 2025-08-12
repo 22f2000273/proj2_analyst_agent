@@ -1,18 +1,15 @@
 {
+  "version": 2,
   "builds": [
     {
-      "src": "*.py",
+      "src": "main.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "app.py"
+      "dest": "main.py"
     }
-  ],
-  "env": {
-    "GENAI_API_KEY": "@GENAI_API_KEY"
-  },
-  "version": 2
+  ]
 }
