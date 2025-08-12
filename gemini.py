@@ -2,9 +2,10 @@ import os
 import json
 import re
 import google.generativeai as genai
-
+from dotenv import load_dotenv
+load_dotenv()
 # Get the API key from environment variable - support both variable names
-api_key = os.getenv("api_key") or os.getenv("GENAI_API_KEY")
+api_key = os.getenv("AIPIPE_TOKEN") or os.getenv("GENAI_API_KEY")
 
 if not api_key:
     raise ValueError("API key environment variable is not set. Please set either 'api_key' or 'GENAI_API_KEY'")
