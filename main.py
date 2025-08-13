@@ -169,17 +169,9 @@ async def web_analyze(question: str = Form(...)):
 
 
 
-# ✅ Remove Mangum completely - replace the last few lines with:
 
-# Simple handler export for Vercel (no Mangum required)
-def handler(request):
-    return app
 
-# Alternative ASGI handler
-async def asgi_handler(scope, receive, send):
-    await app(scope, receive, send)
-
-# For local development only
+# For local development
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
