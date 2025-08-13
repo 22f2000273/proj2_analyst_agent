@@ -7,23 +7,28 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.pyc
 *.pyo
+*.dist-info/
+*.egg-info/
+*.whl
 
-# Virtual environment
+# Virtual environments
 venv/
+.venv/
 env/
 ENV/
-.venv/
 
 # Development and test files
 test_files/
 test_*.py
 *_test.py
+**/tests/
+**/test_*.py
+**/*_test.py
 test_question.txt
 test.sh
 
-# Data files (can be large)
+# Data files
 *.csv
 *.tsv
 *.xlsx
@@ -34,6 +39,7 @@ movies_data.csv
 # Runtime generated files
 uploads/
 upload/
+tmp/
 temp/
 logs/
 *.log
@@ -68,40 +74,11 @@ docs/
 # Build artifacts
 build/
 dist/
-*.egg-info/
 
 # Backup files
 *.backup
 *.bak
 *.tmp
+
+# Misc
 list_sizes.py
-# --- never upload local environments ---
-venv/
-.venv/
-env/
-ENV/
-
-# Python cache / test artefacts
-__pycache__/
-*.py[cod]
-*.dist-info/
-*.egg-info/
-*.whl
-**/tests/
-**/test_*.py
-**/*_test.py
-
-# IDE & OS cruft
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
-
-# Runtime uploads & tmp
-uploads/
-tmp/
-*.log
-
-# Git stuff
-.git/
-.gitignore
