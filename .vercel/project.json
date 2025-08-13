@@ -1,1 +1,16 @@
-{"projectId":"prj_NsdTl3ykvvmNI5hz6DuCWxLCJm9e","orgId":"team_Nii5WVcVdErBY2nCPVxdIC77"}
+{
+  "projectId": "prj_NsdTl3ykvvmNI5hz6DuCWxLCJm9e",
+  "orgId": "team_Nii5WVcVdErBY2nCPVxdIC77",
+  "projectName": "project2-tds",
+  "settings": {
+    "createdAt": 1754851394594,
+    "framework": null,
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "22.x"
+  }
+}
