@@ -17,6 +17,8 @@ venv/
 .venv/
 env/
 ENV/
+venv/
+uploads/
 
 # Development and test files
 test_files/
@@ -82,3 +84,22 @@ dist/
 
 # Misc
 list_sizes.py
+# local Python envs
+venv/
+.venv/
+
+# compiled wheels & caches
+__pycache__/
+*.so
+*.dist-info/
+*.egg-info/
+
+# test data, uploads, large assets
+uploads/
+*.csv
+*.npz
+venv/
+.venv/
+__pycache__/
+uploads/
+*.csv
