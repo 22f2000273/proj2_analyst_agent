@@ -74,3 +74,34 @@ dist/
 *.backup
 *.bak
 *.tmp
+list_sizes.py
+# --- never upload local environments ---
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache / test artefacts
+__pycache__/
+*.py[cod]
+*.dist-info/
+*.egg-info/
+*.whl
+**/tests/
+**/test_*.py
+**/*_test.py
+
+# IDE & OS cruft
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Runtime uploads & tmp
+uploads/
+tmp/
+*.log
+
+# Git stuff
+.git/
+.gitignore
